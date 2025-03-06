@@ -216,7 +216,7 @@ const _sfc_main = create({
     const format = (value) => {
       const { min, max, step } = props;
       value = Math.max(+min, Math.min(value, +max));
-      return Math.round(value / +step) * +step;
+      return Math.round((value - +min) / +step) * +step + +min;
     };
     const isSameValue = (newValue, oldValue) => JSON.stringify(newValue) === JSON.stringify(oldValue);
     const handleOverlap = (value) => {
@@ -248,12 +248,18 @@ const _sfc_main = create({
           state.value.width = rect.width;
           state.value.height = rect.height;
           let clientX, clientY;
-          if (Taro.getEnv() === Taro.ENV_TYPE.WEB) {
-            clientX = event.clientX;
-            clientY = event.clientY;
-          } else {
-            clientX = event.touches[0].clientX;
-            clientY = event.touches[0].clientY;
+          switch (Taro.getEnv()) {
+            case Taro.ENV_TYPE.WEB:
+              clientX = event.clientX;
+              clientY = event.clientY;
+              break;
+            case Taro.ENV_TYPE.SWAN:
+              clientX = event.changedTouches[0].clientX;
+              clientY = event.changedTouches[0].clientY;
+              break;
+            default:
+              clientX = event.touches[0].clientX;
+              clientY = event.touches[0].clientY;
           }
           let delta = clientX - rect.left;
           let total = rect.width;
@@ -400,7 +406,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
     class: normalizeClass(_ctx.containerClasses)
   }, [
     !_ctx.hiddenRange ? (openBlock(), createElementBlock("view", _hoisted_1, toDisplayString(+_ctx.min), 1)) : createCommentVNode("", true),
-    createTextVNode(),
+    _cache[11] || (_cache[11] = createTextVNode()),
     createElementVNode("view", {
       id: "root-" + _ctx.refRandomId,
       ref: "root",
@@ -423,7 +429,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
           ], 6);
         }), 128)) : createCommentVNode("", true)
       ]),
-      createTextVNode(),
+      _cache[10] || (_cache[10] = createTextVNode()),
       createElementVNode("view", {
         class: "nut-range-bar",
         style: normalizeStyle(_ctx.barStyle)
@@ -489,7 +495,7 @@ function _sfc_render(_ctx, _cache, $props, $setup, $data, $options) {
         ], 40, _hoisted_6))
       ], 4)
     ], 14, _hoisted_2),
-    createTextVNode(),
+    _cache[12] || (_cache[12] = createTextVNode()),
     !_ctx.hiddenRange ? (openBlock(), createElementBlock("view", _hoisted_8, toDisplayString(+_ctx.max), 1)) : createCommentVNode("", true)
   ], 2);
 }
