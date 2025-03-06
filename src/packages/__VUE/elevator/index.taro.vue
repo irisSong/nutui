@@ -1,5 +1,5 @@
 <template>
-  <view class="nut-elevator">
+  <view :class="['nut-elevator', `nut-elevator-${uuid}`]">
     <nut-scroll-view
       ref="listview"
       class="nut-elevator__list nut-elevator__list--mini"
@@ -55,7 +55,7 @@
   </view>
 </template>
 <script lang="ts">
-import { computed, reactive, toRefs, nextTick, ref, Ref, watch, PropType } from 'vue'
+import { computed, reactive, toRefs, nextTick, ref, Ref, watch, PropType, onMounted } from 'vue'
 import { createComponent } from '@/packages/utils/create'
 import { ElevatorData } from './type'
 const { create } = createComponent('elevator')
@@ -114,7 +114,8 @@ export default create({
       scrollTop: 0,
       currentData: {} as ElevatorData,
       currentKey: '',
-      scrollY: 0
+      scrollY: 0,
+      uuid: ''
     })
 
     const clientHeight = computed(() => {
@@ -147,7 +148,7 @@ export default create({
       let height = 0
       state.listHeight.push(height)
       for (let i = 0; i < state.listGroup.length; i++) {
-        state.query.selectAll(`.elevator__item__${i}`).boundingClientRect()
+        state.query.selectAll(`.nut-elevator-${state.uuid} .elevator__item__${i}`).boundingClientRect()
         state.query.exec((res) => {
           height += Math.floor(res[i][0].height)
           state.listHeight.push(height)
@@ -211,6 +212,19 @@ export default create({
         }
       }
     }
+
+    const generateUUID = () => {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        const r = (Math.random() * 16) | 0
+        const v = c === 'x' ? r : (r & 0x3) | 0x8
+        return v.toString(16)
+      })
+    }
+
+    // 在组件挂载时生成 UUID
+    onMounted(() => {
+      state.uuid = generateUUID()
+    })
 
     expose({
       scrollTo
